@@ -12,9 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function ($middleware) {
-        $middleware->alias([
-            'rate.limit.user' => \App\Http\Middleware\RateLimitPerUser::class,
-        ]);
+        // $middleware->alias([
+        //     'rate.limit.user' => \App\Http\Middleware\RateLimitPerUser::class,
+        // ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
