@@ -7,14 +7,7 @@ use Illuminate\Support\Facades\Redis;
 Route::group(['prefix' => 'notifications'], function () {
     Route::post('/publish', [NotificationController::class, 'publish']);
     Route::get('/recent', [NotificationController::class, 'recent']);
-    Route::get('/test', function() {
-        return response()->json(['message' => 'API working']);
-    });
     Route::get('/summary', [NotificationController::class, 'summary']);
     Route::put('/{id}/status', [NotificationController::class, 'updateStatus']);
-});
-
-Route::get('/test', function() {
-    return response()->json(['message' => 'API working']);
 });
 
