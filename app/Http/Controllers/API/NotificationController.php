@@ -49,7 +49,6 @@ class NotificationController extends Controller
         $userId  = (int) $request->input('user_id');
         $page    = (int) ($request->input('page', 1));
         $perPage = (int) ($request->input('per_page', 15));
-
         $paginated = $this->service->fetchRecent($userId, $page, $perPage);
 
         return response()->json([
