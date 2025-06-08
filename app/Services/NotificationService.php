@@ -11,30 +11,21 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class NotificationService
 {
-    protected NotificationRepository $repo;
+    public NotificationRepository $repo;
     protected int $rateLimitPerHour;
     protected string $redisChannel;
 
     public function __construct(NotificationRepository $repo)
     {
         $this->repo = $repo;
-        // Rate limit: 10 notifications/user/hour
         $this->rateLimitPerHour = Config::get('notifications.rate_limit_per_hour', 10);
-        // Redis pub/sub channel name
         $this->redisChannel = Config::get('notifications.redis_channel', 'notifications');
     }
 
-    /**
-     * Publish a new notification:
-     *   - Check rate limit
-     *   - Insert into DB
-     *   - Publish to Redis channel for microservice consumption
-     */
     public function publish(array $payload): array
     {
         $userId = $payload['user_id'];
 
-        // 1) Rate limiting
         $now = Carbon::now();
         $oneHourAgo = $now->copy()->subHour();
         $countLastHour = $this->repo->countByUserAndTimeframe($userId, $oneHourAgo, $now);
@@ -48,17 +39,17 @@ class NotificationService
             ];
         }
 
-        // 2) Create record in DB (status = pending by default)
+
         $notification = $this->repo->create([
             'user_id'      => $userId,
             'type'         => $payload['type'],
-            'payload'      => $payload['payload'],     // array or JSON
+            'payload'      => $payload['payload'],
             'scheduled_at' => $payload['scheduled_at'] ?? null,
             'status'       => 'pending',
             'attempts'     => 0,
         ]);
 
-        // 3) Publish message to Redis channel
+
         $message = json_encode([
             'notification_id' => $notification->id,
             'user_id'         => $notification->user_id,
@@ -98,7 +89,7 @@ class NotificationService
         $cacheKey = $userId
             ? "user:{$userId}:notification_summary"
             : "global:notification_summary";
-        $ttlSeconds = 300; // 5 minutes
+        $ttlSeconds = 300;
 
         return Cache::remember(
             $cacheKey,

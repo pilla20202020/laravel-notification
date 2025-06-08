@@ -15,12 +15,7 @@ class RateLimitPerUser
      */
     public function handle(Request $request, Closure $next)
     {
-        // We assume PublishNotificationRequest has validated user_id.
         $userId = (int) $request->input('user_id');
-
-        // Key for caching count: we can also skip caching and rely on DB count in service,
-        // but here we just let service handle DB query. Middleware can short-circuit if needed,
-        // but since service also does it, the middleware can be simpler/do nothing.
         return $next($request);
     }
 }
